@@ -1,20 +1,27 @@
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Scanner;
 
 public class ClientA {
-public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
 
-    Socket s = new Socket("localhost",9999);
-    DataOutputStream dout = new DataOutputStream(s.getOutputStream());
-    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-    while (true){
-        String a = br.readLine();
-        dout.writeUTF(a);
-          if(a.equalsIgnoreCase("exit"))
-              break;
+        Socket s = new Socket("localhost", 9999);
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(s.getInputStream()));
+        PrintWriter writer = new PrintWriter(s.getOutputStream(), true);
+
+        Scanner input = new Scanner(System.in);
+
+        String line;
+
+        while (!(line = input.nextLine()).equalsIgnoreCase("exit")) {
+            writer.println(line);
+            String response = reader.readLine();
+            System.out.println(response);
+        }
+
+        s.close();
     }
-s.close();
-}
 }
