@@ -8,43 +8,6 @@ public class ClientA {
 
     final static int ServerPort = 9999;
 
-    Thread sendMessage = new Thread(new Runnable() {
-        @Override
-        public void run() {
-            while (true) {
-
-
-                Scanner sc;
-                String msg = sc.nextLine();
-                try {
-
-
-                    DataOutput dout;
-                    dout.writeUTF(msg);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    });
-
-    Thread readMessage = new Thread(new Runnable() {
-
-        @Override
-        public void run() {
-
-            while (true) {
-                try {
-                    String msg = din.readUTF();
-                    System.out.println(msg);
-                } catch (IOException e) {
-
-                    e.printStackTrace();
-                }
-            }
-        }
-    });
-
     public static void main(String args[]) throws UnknownHostException, IOException {
         Scanner scn = new Scanner(System.in);
 
