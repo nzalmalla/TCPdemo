@@ -1,27 +1,97 @@
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
+import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.Scanner;
 
 public class ClientA {
-    public static void main(String[] args) throws Exception {
 
-        Socket s = new Socket("localhost", 9999);
+    final static int ServerPort = 9999;
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(s.getInputStream()));
-        PrintWriter writer = new PrintWriter(s.getOutputStream(), true);
+    Thread sendMessage = new Thread(new Runnable() {
+        @Override
+        public void run() {
+            while (true) {
 
-        Scanner input = new Scanner(System.in);
 
-        String line;
+                Scanner sc;
+                String msg = sc.nextLine();
+                try {
 
-        while (!(line = input.nextLine()).equalsIgnoreCase("exit")) {
-            writer.println(line);
-            String response = reader.readLine();
-            System.out.println(response);
+
+                    DataOutput dout;
+                    dout.writeUTF(msg);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
+    });
 
-        s.close();
+    Thread readMessage = new Thread(new Runnable() {
+
+        @Override
+        public void run() {
+
+            while (true) {
+                try {
+                    String msg = din.readUTF();
+                    System.out.println(msg);
+                } catch (IOException e) {
+
+                    e.printStackTrace();
+                }
+            }
+        }
+    });
+
+    public static void main(String args[]) throws UnknownHostException, IOException {
+        Scanner scn = new Scanner(System.in);
+
+        InetAddress ip = InetAddress.getByName("localhost");
+
+
+        Socket s = new Socket(ip, ServerPort);
+
+
+        DataInputStream din = new DataInputStream(s.getInputStream());
+        DataOutputStream dout = new DataOutputStream(s.getOutputStream());
+
+
+        Thread sendMessage = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (true) {
+                    String msg = scn.nextLine();
+                    try {
+
+                        dout.writeUTF(msg);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+
+        Thread readMessage = new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                while (true) {
+                    try {
+
+                        String msg = din.readUTF();
+                        System.out.println(msg);
+                    } catch (IOException e) {
+
+                        e.printStackTrace();
+                    }
+                }
+            }
+        });
+
+        sendMessage.start();
+        readMessage.start();
+
     }
 }
