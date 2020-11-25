@@ -1,12 +1,17 @@
-import java.io.*;
+package com.anjal;
+
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
 public class ServerA {
-    static Vector<ClientHandler> ar = new Vector<>();
+    static Vector<ClientHandler> ar = new ArrayList<>();
 
 
     static int i = 0;
@@ -42,7 +47,7 @@ public class ServerA {
 
 class ClientHandler implements Runnable {
     Scanner scn = new Scanner(System.in);
-    private String name;
+    private final String name;
     final DataInputStream din;
     final DataOutputStream dout;
     Socket s;
@@ -78,7 +83,7 @@ class ClientHandler implements Runnable {
 
                 for (ClientHandler mc : ServerA.ar) {
 
-                    if (mc.name.equals(recipient) && mc.isloggedin == true) {
+                    if (mc.name.equals(recipient) && mc.isloggedin) {
                         mc.dout.writeUTF(this.name + " : " + MsgToSend);
                         break;
                     }
