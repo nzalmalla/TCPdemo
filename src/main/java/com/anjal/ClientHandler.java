@@ -7,17 +7,20 @@ import java.net.Socket;
 import java.util.StringTokenizer;
 
 public class ClientHandler implements Runnable {
-    final DataInputStream din;
-    final DataOutputStream dout;
+    private final Server server;
+    private final DataInputStream din;
+    private final DataOutputStream dout;
     private final String name;
-    boolean isloggedin;
-    Socket s;
+    private boolean isloggedin;
+    private Socket s;
 
 
-    public ClientHandler(Socket s,
+    public ClientHandler(Server server,
+                         Socket s,
                          String name,
                          DataInputStream din,
                          DataOutputStream dout) {
+        this.server = server;
         this.din = din;
         this.dout = dout;
         this.name = name;
@@ -38,27 +41,32 @@ public class ClientHandler implements Runnable {
                     this.isloggedin = false;
                     this.s.close();
                     break;
-                }
-                StringTokenizer st = new StringTokenizer(received, "#");
-                if (st.countTokens() < 2) {
-                    System.out.println("Not valid token : " + st);
-                    break;
-                }
-                String msgToSend = st.nextToken();
-                String recipient = st.nextToken();
-
-                for (ClientHandler mc : ServerA.ar) {
-
-                    if (mc.name.equals(recipient) && mc.isloggedin) {
-                        mc.dout.writeUTF(this.name + " : " + msgToSend);
-                        break;
-                    }
+                } else {
+                    sendToClient(received);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
         }
+        close();
+    }
+
+    private void sendToClient(String received) throws IOException {
+        StringTokenizer st = new StringTokenizer(received, "#");
+        if (st.countTokens() == 2) {
+            String msgToSend = st.nextToken();
+            String recipient = st.nextToken();
+
+            for (ClientHandler mc : server.getAr()) {
+                if (mc.name.equals(recipient) && mc.isloggedin) {
+                    mc.dout.writeUTF(this.name + " : " + msgToSend);
+                    break;
+                }
+            }
+        }
+    }
+
+    private void close() {
         try {
             this.din.close();
             this.dout.close();
